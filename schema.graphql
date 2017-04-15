@@ -1,0 +1,107 @@
+
+type User {
+
+  # unique id of the user / app installation
+  id: String
+
+  # Define whether a User is currently allowed to vote
+  canVote: Boolean
+
+  # UTC Date when the user can vote again
+  canVoteAgainAt: Date
+
+}
+
+# A District is the entity that someone can vote upon
+type District {
+
+  # Code/identifier, e.g. OF
+  id: String
+
+  # Name of the district, e.g. Offenbach
+  name: String
+
+  # Greater region this district belongs to, e.g. Hessen
+  region: Region
+
+  # The country this district belongs to
+  country: Country
+
+}
+
+# A country being represented by the App (initially only Germany)
+type Country {
+
+  # 2-Letter ISO code
+  id: String
+
+  # Country name
+  name: String
+
+}
+
+# A region within a country (e.g. a state)
+type Region {
+  id: String
+  name: String
+  country: Country
+}
+
+# A single ranking for one district
+type DistrictRanking {
+  district: District
+  votes: Int
+}
+
+# A single ranking for one region
+type DistrictRanking {
+  region: Region
+  votes: Int
+}
+
+# Root Query type to start all data queries
+type Query {
+
+  # get a list of all districts
+  districts: [District]
+
+  # get the ranking results for districts (requires country)
+  districtRankings(countryID: String!): [DistrictRanking]
+
+  # get the ranking results for regions (requires country)
+  regionRankings(countryID: String!): [RegionRanking]
+
+}
+
+# Input type for voteDistrict mutation
+input VoteDistrictInput {
+
+  # The voting user
+  userID: String!
+
+  # The country being represented by the app
+  countryID: String!
+
+  # The district to vote on
+  districtID: String!
+
+}
+
+# Output type for voteDistrict mutation
+type VoteDistrictOutput {
+
+  # The district voted on
+  district: District
+
+  # The user that voted
+  user: User
+
+}
+
+# All mutations/actions that can be performed
+type Mutation {
+
+  # vote against a district
+  mutation voteDistrict(data: VoteDistrictInput): VoteDistrictOutput
+
+}
